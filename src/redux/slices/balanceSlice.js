@@ -11,8 +11,11 @@ const balanceSlice = createSlice({
     setBalance: (state, action) => {
       state.balance = action.payload;
     },
+    subtractBalance: (state, action) => {
+      state.balance -= action.payload;
+    }
   },
 });
 
-export const { setBalance } = balanceSlice.actions;
+export const { setBalance, subtractBalance} = balanceSlice.actions;
 export default balanceSlice.reducer;

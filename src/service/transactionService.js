@@ -8,11 +8,13 @@ const transactionService = {
     return axiosInstance.post("/topup", payload);
   },
   transaction: (payload) => {
-    return axiosInstance.post('/transaction', payload)
+    return axiosInstance.post("/transaction", payload);
   },
-  getHistory: () => {
-    return axiosInstance.get('/transaction/history')
-  }
+  getHistory: ({ offset = 0, limit = 5 }) => {
+    return axiosInstance.get(
+      `/transaction/history?offset=${offset}&limit=${limit}`
+    );
+  },
 };
 
 export default transactionService;

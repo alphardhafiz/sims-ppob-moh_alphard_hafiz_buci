@@ -1,34 +1,35 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import NameBalanceSection from "../../components/NameBalanceSection";
 import transactionService from "../../service/transactionService";
 import { CheckCircle, XCircle } from "lucide-react";
 import Logo from "../../assets/Logo.png";
 import formatNumber from "../../utils/formatNumber";
-import { useDispatch } from "react-redux";
-import { setBalance } from "../../redux/slices/balanceSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { subtractBalance } from "../../redux/slices/balanceSlice";
 
-const TopUp = () => {
+const Pembayaran = () => {
+  const { service_code } = useParams();
+  const service = useSelector((state) => state.services.services).filter((service) => service.service_code === service_code)[0]
   const dispatch = useDispatch()
-  const [amount, setAmount] = useState("");
+  const [amount, setAmount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [modalContent, setModalContent] = useState({
     type: "pending",
     data: '',
   });
-
-  const quickAmounts = [10000, 20000, 50000, 100000, 250000, 500000];
-
-  const handleQuickAmount = (value) => {
-    setAmount(value.toString());
-  };
-
+  useEffect(() => {
+    if(service){
+        setAmount(service.service_tariff)
+    }
+  }, [service])
   const handleTopUp = async () => {
     setLoading(true);
     try {
-      const res = await transactionService.topup({ top_up_amount: +amount });
+      const res = await transactionService.transaction({ service_code });
       setModalContent({ type: "success", data: res.data.data });
-      dispatch(setBalance(res.data.data.balance))
+      dispatch(subtractBalance(service.service_tariff))
       setShowModal(true);
     } catch (error) {
       console.log(error);
@@ -40,24 +41,25 @@ const TopUp = () => {
 
   const closeModal = () => {
     setShowModal(false);
-    setAmount("");
   };
-
   return (
     <div className="flex flex-col gap-10 px-24 relative">
       <NameBalanceSection />
-      <div className="flex-1 flex flex-col">
-        <div className="mb-2"></div>
-        <h2 className="text-lg text-gray-500 font-bold">Silahkan masukan</h2>
-        <h2 className="text-3xl font-bold">Nominal Top Up</h2>
+      <div className="flex-1 flex flex-col gap-2">
+        <h2 className="text-lg text-gray-500 font-bold">Pembayaran</h2>
+        <div className="flex gap-3">
+            <img src={service?.service_icon} className="w-8 h-8" alt="" />
+        <h2 className="text-xl font-semibold">{service?.service_name}</h2>
+        </div>
       </div>
       <div className="flex">
         <div className="flex flex-1 flex-col mr-4">
           <input
             type="text"
-            value={amount}
+            value={service?.service_tariff||0}
+            readOnly
             onChange={(e) => setAmount(e.target.value)}
-            placeholder="masukan nominal Top Up"
+            placeholder="masukan nominal pembayaran"
             className="w-full p-2 border border-gray-300 rounded-md mb-4"
           />
           <button
@@ -65,23 +67,11 @@ const TopUp = () => {
               setShowModal(true);
               setModalContent({ type: "pending", amount });
             }}
-            disabled={!amount || loading}
+            disabled={loading}
             className="w-full py-2 bg-red-600 hover:bg-red-700 rounded-md text-white disabled:bg-gray-300 transition duration-300"
           >
-            {loading ? "Top Up..." : "Top Up"}
+            {loading ? "Bayar..." : "Top Up"}
           </button>
-        </div>
-
-        <div className="grid grid-cols-3 gap-4 mb-6">
-          {quickAmounts.map((value) => (
-            <button
-              key={value}
-              onClick={() => handleQuickAmount(value)}
-              className="py-2 px-4 bg-white text-gray-700 hover:bg-gray-300 border border-black"
-            >
-              Rp{formatNumber(value)}
-            </button>
-          ))}
         </div>
       </div>
 
@@ -91,29 +81,35 @@ const TopUp = () => {
             {modalContent.type === "success" ? (
               <>
                 <CheckCircle className="mx-auto mb-4 h-12 w-12 text-green-500" />
-                <h3 className="text-xl font-bold mb-2">Top Up sebesar</h3>
-                <p className="text-2xl font-bold mb-4">Rp{formatNumber(amount)}</p>
+                <h3 className="mb-2">Pembayaran {service?.service_name} sebesar</h3>
+                <p className="text-2xl font-bold mb-4">
+                  Rp{formatNumber(amount)}
+                </p>
                 <p className="font-semibold mb-4">berhasil!</p>
               </>
             ) : modalContent.type === "failed" ? (
               <>
                 <XCircle className="mx-auto mb-4 h-12 w-12 text-red-500" />
-                <h3 className="text-xl font-bold mb-2">Top Up sebesar</h3>
-                <p className="text-2xl font-bold mb-4">Rp{formatNumber(amount)}</p>
-                <p className="font-semibold mb-4">gagal!</p> 
+                <h3 className="mb-2">Pembayaran {service?.service_name} sebesar</h3>
+                <p className="text-2xl font-bold mb-4">
+                  Rp{formatNumber(amount)}
+                </p>
+                <p className="font-semibold mb-4">gagal!</p>
               </>
             ) : (
               <>
                 <img src={Logo} className="mx-auto mb-4 h-12 w-12" alt="" />
-                <h3 className="text-xl font-bold mb-2">
-                  Anda yakin Top Up sebesar
+                <h3 className="mb-2">
+                Bayar {service?.service_name} sebesar
                 </h3>
-                <p className="text-2xl font-bold mb-4">Rp{formatNumber(amount)}</p>
+                <p className="text-2xl font-bold mb-4">
+                  Rp{formatNumber(amount)}
+                </p>
                 <button
                   onClick={handleTopUp}
-                  className="text-red-500 hover:underline font-bold block mx-auto"
+                  className="text-red-500 font-bold block mx-auto hover:underline"
                 >
-                  Ya, lanjutkan Top Up
+                  Ya, lanjutkan bayar
                 </button>
               </>
             )}
@@ -136,4 +132,4 @@ const TopUp = () => {
   );
 };
 
-export default TopUp;
+export default Pembayaran;

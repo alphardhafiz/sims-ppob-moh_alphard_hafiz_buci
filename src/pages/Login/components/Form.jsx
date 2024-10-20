@@ -24,7 +24,6 @@ const Form = ({ setErrMsg }) => {
     setErrMsg(null);
     try {
       const res = await authService.login(data);
-      console.log("token", res.data.data.token);
       dispatch(loginSuccess({ token: res.data.data.token }));
       localStorage.setItem('token_sims_ppob', res.data.data.token)
       navigate("/");

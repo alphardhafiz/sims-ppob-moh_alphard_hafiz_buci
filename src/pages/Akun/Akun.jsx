@@ -10,10 +10,11 @@ import { setProfile } from "../../redux/slices/profileSlice";
 
 const Akun = () => {
   const [isEdit, setIsEdit] = useState(false);
-  const profile = useSelector((state) => state.profile).profile;
+  const [isLoading, setIsLoading] = useState(false);
+  const profile = useSelector((state) => state.profile.profile);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const fileInputRef = useRef(null); // Ref untuk input file
+  const fileInputRef = useRef(null);
 
   const { register, handleSubmit, reset } = useForm({
     defaultValues: {
@@ -24,20 +25,22 @@ const Akun = () => {
   });
 
   const onSubmit = async (data) => {
+    setIsLoading(true);
     try {
-      console.log({ data });
       await profileService.updateProfile(data);
       const profileRes = await profileService.getProfile();
       dispatch(setProfile(profileRes.data.data));
-      setIsEdit(false)
+      setIsEdit(false);
     } catch (error) {
       console.log({ error });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleImageChange = async (e) => {
     try {
-      const file = e.target.files[0]; // Ambil file yang dipilih
+      const file = e.target.files[0];
       if (file) {
         const formData = new FormData();
         formData.append("file", file);
@@ -74,12 +77,11 @@ const Akun = () => {
                 : profile.profile_image
             }
             alt={profile.first_name}
-            className="w-24 h-24 rounded-full"
+            className="w-24 h-24 rounded-full object-cover"
           />
-          {/* Button untuk membuka file input */}
           <button
             type="button"
-            onClick={() => fileInputRef.current.click()} // Trigger input file saat diklik
+            onClick={() => fileInputRef.current.click()} 
             className="absolute bottom-0 right-0 bg-white rounded-full p-1 shadow-md"
           >
             <PencilIcon size={16} className="text-gray-600" />
@@ -90,13 +92,12 @@ const Akun = () => {
         </h2>
       </div>
 
-      {/* Input file untuk memilih gambar, disembunyikan */}
       <input
         type="file"
         accept="image/*"
-        ref={fileInputRef} // Menghubungkan ref ke input file
-        style={{ display: "none" }} // Sembunyikan input
-        onChange={handleImageChange} // Trigger saat file dipilih
+        ref={fileInputRef} 
+        style={{ display: "none" }} 
+        onChange={handleImageChange} 
       />
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -136,9 +137,10 @@ const Akun = () => {
         {isEdit ? (
           <button
             type="submit"
-            className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+            disabled={isLoading}
+            className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-40"
           >
-            Simpan
+            {isLoading ? 'Simpan...' : 'Simpan'}
           </button>
         ) : (
           <>

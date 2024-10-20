@@ -1,0 +1,19 @@
+api update profile untuk email tidak terupdate
+curl 'https://take-home-test-api.nutech-integrasi.com/profile/update' \
+  -X 'PUT' \
+  -H 'accept: application/json, text/plain, */*' \
+  -H 'accept-language: en,id;q=0.9,en-US;q=0.8' \
+  -H 'authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlczEyM0B0ZXMxMjMuY29tIiwibWVtYmVyQ29kZSI6Ik0yRVZZMUVJIiwiaWF0IjoxNzI5MzY3NjU1LCJleHAiOjE3Mjk0MTA4NTV9.WNuWm63Tis9H5Bc784bXHseRukbTNTLog8DLMJfuVlw' \
+  -H 'content-type: application/json' \
+  -H 'origin: http://localhost:5173' \
+  -H 'priority: u=1, i' \
+  -H 'referer: http://localhost:5173/' \
+  -H 'sec-ch-ua: "Google Chrome";v="129", "Not=A?Brand";v="8", "Chromium";v="129"' \
+  -H 'sec-ch-ua-mobile: ?0' \
+  -H 'sec-ch-ua-platform: "Windows"' \
+  -H 'sec-fetch-dest: empty' \
+  -H 'sec-fetch-mode: cors' \
+  -H 'sec-fetch-site: cross-site' \
+  -H 'user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36' \
+  --data-raw '{"email":"alphard@buci.com","first_name":"Alphard","last_name":"Buci","profile_image":"https://minio.nutech-integrasi.com/take-home-test/profile/M2EVY1EI-1729385147454.jpg"}'
+
