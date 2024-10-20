@@ -1,20 +1,20 @@
 import { useState } from "react";
 import NameBalanceSection from "../../components/NameBalanceSection";
 import transactionService from "../../service/transactionService";
-import { CheckCircle, XCircle } from "lucide-react";
+import { Banknote, CheckCircle, XCircle } from "lucide-react";
 import Logo from "../../assets/Logo.png";
 import formatNumber from "../../utils/formatNumber";
 import { useDispatch } from "react-redux";
 import { setBalance } from "../../redux/slices/balanceSlice";
 
 const TopUp = () => {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   const [amount, setAmount] = useState("");
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [modalContent, setModalContent] = useState({
     type: "pending",
-    data: '',
+    data: "",
   });
 
   const quickAmounts = [10000, 20000, 50000, 100000, 250000, 500000];
@@ -28,7 +28,7 @@ const TopUp = () => {
     try {
       const res = await transactionService.topup({ top_up_amount: +amount });
       setModalContent({ type: "success", data: res.data.data });
-      dispatch(setBalance(res.data.data.balance))
+      dispatch(setBalance(res.data.data.balance));
       setShowModal(true);
     } catch (error) {
       console.log(error);
@@ -53,13 +53,19 @@ const TopUp = () => {
       </div>
       <div className="flex">
         <div className="flex flex-1 flex-col mr-4">
-          <input
-            type="text"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            placeholder="masukan nominal Top Up"
-            className="w-full p-2 border border-gray-300 rounded-md mb-4"
-          />
+          <div className="relative">
+            <Banknote
+              className="absolute top-3 left-3 text-gray-400"
+              size={20}
+            />
+            <input
+              type="text"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              placeholder="masukan nominal Top Up"
+              className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md mb-4"
+            />
+          </div>
           <button
             onClick={() => {
               setShowModal(true);
@@ -92,15 +98,19 @@ const TopUp = () => {
               <>
                 <CheckCircle className="mx-auto mb-4 h-12 w-12 text-green-500" />
                 <h3 className="text-xl font-bold mb-2">Top Up sebesar</h3>
-                <p className="text-2xl font-bold mb-4">Rp{formatNumber(amount)}</p>
+                <p className="text-2xl font-bold mb-4">
+                  Rp{formatNumber(amount)}
+                </p>
                 <p className="font-semibold mb-4">berhasil!</p>
               </>
             ) : modalContent.type === "failed" ? (
               <>
                 <XCircle className="mx-auto mb-4 h-12 w-12 text-red-500" />
                 <h3 className="text-xl font-bold mb-2">Top Up sebesar</h3>
-                <p className="text-2xl font-bold mb-4">Rp{formatNumber(amount)}</p>
-                <p className="font-semibold mb-4">gagal!</p> 
+                <p className="text-2xl font-bold mb-4">
+                  Rp{formatNumber(amount)}
+                </p>
+                <p className="font-semibold mb-4">gagal!</p>
               </>
             ) : (
               <>
@@ -108,7 +118,9 @@ const TopUp = () => {
                 <h3 className="text-xl font-bold mb-2">
                   Anda yakin Top Up sebesar
                 </h3>
-                <p className="text-2xl font-bold mb-4">Rp{formatNumber(amount)}</p>
+                <p className="text-2xl font-bold mb-4">
+                  Rp{formatNumber(amount)}
+                </p>
                 <button
                   onClick={handleTopUp}
                   className="text-red-500 hover:underline font-bold block mx-auto"
